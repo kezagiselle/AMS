@@ -12,14 +12,14 @@ const addToken = asyncWrapper(async (req, res, next)=>{
     return res.status(201).json(newToken);
 });
 
-const findByUser = asyncWrapper(async(req,res,next) =>{
-    const tokenOwner = req.params.user;
-
-    const foundToken = await tokenModel.findOne({tokenOwner});
-    return res.status(200).jsonn({
-        foundToken
-    });
-});
+const findById = asyncWrapper(async(res,req,next) =>{
+    const tokenId = req.params.id;
+    const token = await tokenModel.findById(tokenId);
+    if(token){
+        return res.status(200).json(token);
+    }
+    res.status(404).json({message: 'Token not found'});
+})
 
 const getAllTokens = asyncWrapper(async(req,res, next) =>{
     const tokens = await tokenModel.find({});
@@ -40,7 +40,7 @@ const deleteToken = asyncWrapper(async (req, res, next) => {
 
 const tokenControllers = {
     addToken,
-    findByUser,
+    findById,
     getAllTokens,
     deleteToken
 };

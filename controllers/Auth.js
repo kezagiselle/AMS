@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import bcrypt from 'bcrypt';
 import otpGenerator from "../utilis/otp.js";
+import nodemailer from 'nodemailer';
 
 const signUp = asyncWrapper(async (req, res, next) =>{
     const errors = validationResult(req);
@@ -53,7 +54,7 @@ const login = asyncWrapper(async (req, res, next) =>{
         return next(new BadRequestError('Invalid email or password'));
     };
     //Check if the account is verified
-    if(!foundUser.verified){
+    if(!user.verified){
         return next(new BadRequestError('Your account is verified!'))
     };
     const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
@@ -67,6 +68,13 @@ const login = asyncWrapper(async (req, res, next) =>{
     });
 });
 
+const logout = asyncWrapper(async (req, res,next) => {
+    res.clearCookie('token');
+    res.status(200).json({
+        message: 'Logged out successfully!'
+    });
+    });
+    
 const validateOtp = asyncWrapper(async (req, res, next) =>{
     const errors = validationResult(req);
     if(!errors.isEmpty()){
@@ -161,6 +169,7 @@ const userControllers = {
     validateOtp,
     forgotPassword,
     resetPassword,
-    deleteUser
+    deleteUser,
+    logout
 };
 export default userControllers;
